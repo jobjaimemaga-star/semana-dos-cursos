@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TB-Guard | Acesso Seguro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-cyber: #050b14;
+            --cyan-neon: #00ffff;
+            --blue-glass: rgba(10, 25, 47, 0.7);
+        }
+
+        body {
+            background-color: var(--bg-cyber);
+            background-image: radial-gradient(#112240 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #e0e1dd;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--blue-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid #112240;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--cyan-neon);
+            text-shadow: 0 0 10px var(--cyan-neon);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            background: rgba(13, 27, 42, 0.8);
+            border: 1px solid #415a77;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-control:focus {
+            background: #0d1b2a;
+            border-color: var(--cyan-neon);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-cyber {
+            background: linear-gradient(45deg, #415a77, #1b263b);
+            border: 1px solid var(--cyan-neon);
+            color: var(--cyan-neon);
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 12px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-cyber:hover {
+            background: var(--cyan-neon);
+            color: #050b14;
+            box-shadow: 0 0 20px var(--cyan-neon);
+        }
+
+        .toggle-link {
+            color: #778da9;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+
+        .toggle-link:hover { color: var(--cyan-neon); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="text-center mb-4">
+        <div class="brand-logo">TB-GUARD</div>
+        <p class="text-muted small">Módulo de Acesso do Paciente</p>
+    </div>
+
+    <div id="loginSection">
+        <form id="loginForm">
+            <div class="input-group mb-3">
+                <span class="input-group-text bg-dark border-secondary text-info"><i class="fas fa-id-card"></i></span>
+                <input type="text" id="loginBI" class="form-control mb-0" placeholder="Nº de Bilhete (BI)" required>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text bg-dark border-secondary text-info"><i class="fas fa-lock"></i></span>
+                <input type="password" id="loginSenha" class="form-control mb-0" placeholder="Senha de Acesso" required>
+            </div>
+            <button type="submit" class="btn btn-cyber w-100 mt-2">Entrar no Sistema</button>
+        </form>
+        <div class="text-center mt-4">
+            <span class="toggle-link" onclick="toggleForms()">Não tem uma conta? Registe-se</span>
+        </div>
+    </div>
+
+    <div id="registerSection" style="display: none;">
+        <form id="registerForm">
+            <input type="text" id="regNome" class="form-control" placeholder="Nome Completo" required>
+            <input type="text" id="regBI" class="form-control" placeholder="Nº de Bilhete (BI)" required>
+            <input type="password" id="regSenha" class="form-control" placeholder="Criar Senha" required>
+            <button type="submit" class="btn btn-cyber w-100">Criar Minha Conta</button>
+        </form>
+        <div class="text-center mt-4">
+            <span class="toggle-link" onclick="toggleForms()">Já tem conta? Faça Login</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://127.0.0.1:5000';
+
+    function toggleForms() {
+        const login = document.getElementById('loginSection');
+        const reg = document.getElementById('registerSection');
+        login.style.display = login.style.display === 'none' ? 'block' : 'none';
+        reg.style.display = reg.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // LÓGICA DE REGISTO
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dados = {
+            nome: document.getElementById('regNome').value,
+            bi: document.getElementById('regBI').value,
+            senha: document.getElementById('regSenha').value
+        };
+
+        const res = await fetch(`${API_URL}/auth/registo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        if (res.ok) {
+            alert("Registo concluído! Agora faça login.");
+            toggleForms();
+        } else {
+            alert("Erro ao registar. Verifique se o BI já existe.");
+        }
+    });
+
+    // LÓGICA DE LOGIN
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dados = {
+            bi: document.getElementById('loginBI').value,
+            senha: document.getElementById('loginSenha').value
+        };
+
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+
+        const user = await res.json();
+
+        if (res.ok) {
+            // Guarda a sessão e redireciona
+            sessionStorage.setItem('usuarioAtivo', JSON.stringify(user));
+            window.location.href = 'dashboard_paciente.html';
+        } else {
+            alert(user.erro || "Falha no login");
+        }
+    });
+</script>
+
+</body>
+</html>
